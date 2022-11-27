@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="style.css">
+
+    <title>Document</title>
+</head>
+
+<body class="inline-size">
+
+    <div class="wrapper inline-size">
+
+        <div id="img-wrapper" class="inline-size">
+            <div id="img-container" class="inline-size">
+                <img id="cover" src="pic.jpg" class="rotate">
+            </div>
+        </div>
+
+        <div id="info-wrapper" class="inline-size">
+            <h2 id="track">Counting Stars</h2>
+            <h3 id="artist">One Republic</h3>
+        </div>
+
+        <div id="duration-wrapper" class="inline-size">
+            <small id="current">00:00</small>
+            <div id="song-slider">
+                <input type="range" value="0" class="seek-bar" onchange="seekTo()">
+            </div>
+            <small id="total">00:00</small>
+        </div>
+
+        <div id="controls-wrapper" class="inline-size">
+            <img src="shuffle.png" class="icon" id="shuffle" onclick="randomTrack()">
+            <img src="back-button.png" class="icon" id="back" onclick="prevTrack()">
+            <img src="play.png" class="icon" id="play" onclick="startPlaying()">
+            <img src="next-button.png" class="icon" id="next" onclick="skipTrack()">
+            <img src="repeat.png" class="icon" id="repeat" onclick="repeatTrack()">
+        </div>
+
+    </div>
+
+    <div class="wrapper background inline-size"></div>
+
+    <div id="back-cover" class="inline-size">
+        <img id="back-cover-img" src="">
+    </div>
+
+    <script src=" scripts.js"></script>
+    <script src="collection.js"></script>
+
+</body>
+
+</html>
