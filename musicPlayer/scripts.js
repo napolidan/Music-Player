@@ -24,17 +24,14 @@ let updateTimer;
 var busy = false;
 
 
-function loadTrack(track_index) {
-    clearTimeout(updateTimer);
-    reset();
-
+function loadTrackList(){
+    
     currentTrack.src = collection[track_index].song;
     currentTrack.load();
 
     cover.src = collection[track_index].img;
+    cover.style.animationPlayState = 'paused';
     backCover.src = collection[track_index].img;
-
-    backCover.classList.remove("img-visible");
     backCover.classList.add("img-visible");
 
     artist.textContent = collection[track_index].artist;
@@ -42,16 +39,48 @@ function loadTrack(track_index) {
 
     updateTimer = setInterval(setUpdate, 100);
 
-    track.textContent = collection[track_index].track
+    track.textContent = collection[track_index].track;
 
     currentTrack.addEventListener("ended", nextTrack);
+}
 
+function loadTrack(track_index) {
+
+    currentTrack.src = collection[track_index].song;
+    currentTrack.load();
+
+    fadeOutImage();
+    
+    setTimeout(() => {
+        cover.src = collection[track_index].img;
+        backCover.src = collection[track_index].img;
+
+        artist.textContent = collection[track_index].artist;
+
+        fadeInImage();
+        document.body.style.backgroundImage = collection[track_index].img;
+
+        updateTimer = setInterval(setUpdate, 100);
+
+        track.textContent = collection[track_index].track
+
+        currentTrack.addEventListener("ended", nextTrack);
+    }, 300);    
 }
 
 function reset() {
+    clearTimeout(updateTimer);
     current.textContent = "00:00";
     slide.value = 0;
     total.textContent = "00:00";
+}
+
+function fadeOutImage(){
+    backCover.classList.remove("img-visible");
+}
+
+function fadeInImage(){
+    backCover.classList.add("img-visible");
 }
 
 function randomTrack() {
@@ -60,12 +89,12 @@ function randomTrack() {
 
 function playRandom() {
     isRandom = true;
-    shuffle.classList.add('randomActive');
+    shuffle.classList.add("turnedOn");
 }
 
 function pauseRandom() {
     isRandom = false;
-    shuffle.classList.remove('randomActive');
+    shuffle.classList.remove("turnedOn");
 }
 
 function repeatTrack() {
@@ -74,25 +103,32 @@ function repeatTrack() {
 
 function playRepeat() {
     isRepeat = true;
-    repeat.classList.add('repeatActive');
+    repeat.classList.add("turnedOn");
 }
 
 function pauseRepeat() {
     isRepeat = false;
-    repeat.classList.remove('repeatActive');
+    repeat.classList.remove("turnedOn");
 }
 
+// STOP AND PLAY
+
 function startPlaying() {
-    const running = cover.style.animationPlayState || 'paused';
-    cover.style.animationPlayState = running === 'running' ? 'paused' : 'running';
     isPlaying ? pauseTrack() : playTrack();
 }
 
 function playTrack() {
+
     currentTrack.volume = 0;
 
+    // FADE IN VOLUMEN
+
     myInterval = setInterval(function fadeInVolume() {
-        if (currentTrack.volume <= 0.995) {
+
+        if (currentTrack.volume <= 0.5) {
+            currentTrack.volume += 0.015;
+        }
+        else if(currentTrack.volume > 0.5 && currentTrack.volume <= 0.995){
             currentTrack.volume += 0.005;
         }
         else {
@@ -104,49 +140,81 @@ function playTrack() {
 
     }
 
-    loadTrack(track_index);
     currentTrack.play();
-
     isPlaying = true;
-    play.src = "pause.png";
 }
 
 function pauseTrack() {
+
+    myInterval = setInterval(function fadeOutVolume() {
+
+        if (currentTrack.volume > 0) {
+            currentTrack.volume -= 0.005;
+        }
+        else {
+            clearTimeout();
+        }
+    }, 25);
+
     currentTrack.pause();
     isPlaying = false;
-    play.src = "play.png";
 }
 
+
+// SE ACABA UNA CANCIÓN
+
 function nextTrack() {
+
+    // NO RANDOM, NO REPEAT - NEXT SONG
     if (track_index < collection.length - 1 && isRandom == false && isRepeat == false) {
         track_index += 1;
     }
-    else if (track_index < collection.length - 1 && isRandom == true && isRepeat == false) {
-        let random_index = Number.parseInt(Math.random() * collection.length);
-        track_index = random_index;
-    }
-    else if (track_index < collection.length - 1 && isRepeat == false) {
+
+    // SI REPEAT - SAME SONG
+    else if(isRepeat == true){
         track_index = track_index;
     }
-    else {
+
+    // SI RANDOM, NO REPEAT - RANDOM SONG
+    else if (isRandom == true && isRepeat == false) {
+        do{
+            let random_index = Number.parseInt(Math.random() * collection.length);
+        }while(track_index != random_index);
+        track_index = random_index;
+    }
+    
+    // NO RANDOM, NO REPEAT, LAST SONG - FIRST SONG
+    else{
         track_index = 0;
     }
+
     loadTrack(track_index);
+    reset();
     playTrack();
 }
 
+// SE SKIPEA UNA CANCIÓN
+
 function skipTrack() {
+    
+    // NO RANDOM, NO REPEAT - NEXT SONG
     if (track_index < collection.length - 1 && isRandom == false) {
         track_index += 1;
     }
-    else if (track_index < collection.length - 1 && isRandom == true) {
+
+    // SI RANDOM - RANDOM SONG
+    else if (isRandom == true) {
         let random_index = Number.parseInt(Math.random() * collection.length);
         track_index = random_index;
     }
+
+    // NO RANDOM, LAST SONG - FIRST SONG
     else {
         track_index = 0;
     }
+
     loadTrack(track_index);
+    reset();
     playTrack();
 }
 
@@ -154,10 +222,11 @@ function prevTrack() {
     if (track_index > 0) {
         track_index -= 1;
     }
-    else {
+    else{
         track_index = collection.length - 1;
     }
     loadTrack(track_index);
+    reset();
     playTrack();
 }
 
@@ -189,6 +258,7 @@ currentTrack.addEventListener("loadedmetadata", function () {
 function setUpdate() {
     let seekPosition = 0;
     if (!isNaN(currentTrack.duration)) {
+
         // seekPosition = currentTrack.currentTime * (100 / currentTrack.duration);
         // slide.value = seekPosition;
 
@@ -205,5 +275,15 @@ function setUpdate() {
 
         current.innerHTML = currentMinutes + ":" + currentSeconds;
         total.innerHTML = totalMinutes + ":" + totalSeconds;
+
+        if(!currentTrack.paused){
+            play.src = "pause.png";
+            cover.style.animationPlayState = 'running';
+        }
+        else{
+            play.src = "play.png";
+            cover.style.animationPlayState = 'paused';
+        }
+
     }
 }

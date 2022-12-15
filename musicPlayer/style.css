@@ -54,7 +54,7 @@ body {
     justify-content: space-around;
 
 
-    border-radius: calc(var(--wrapperSize)/10);
+    border-radius: calc(var(--wrapperSize)/4);
 
     padding: 2.5rem;
     padding-block: 1.5rem;
@@ -158,6 +158,7 @@ small {
     margin-bottom: auto;
     width: 10cqi;
     height: 10cqi;
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(192deg) brightness(102%) contrast(102%);
 }
 
 .icon:nth-child(3) {
@@ -173,6 +174,10 @@ small {
 .icon:active {
     cursor: -webkit-grabbing;
     pointer: grabbing;
+}
+
+.turnedOn{
+    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(192deg) brightness(102%) contrast(102%) drop-shadow(0px 0px 5px #F4DDFF);
 }
 
 
@@ -224,8 +229,9 @@ small {
 
     background: linear-gradient(0deg, transparent, var(--lines), var(--lines));
 
-    animation: rotacion linear 6s infinite;
-    animation-delay: 3s;
+    transform: rotate(180deg);
+
+    animation: rotacion2 linear 6s infinite;
     transform-origin: right bottom;
 }
 
@@ -236,6 +242,16 @@ small {
 
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes rotacion2 {
+    0% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(540deg);
     }
 }
 
@@ -251,7 +267,6 @@ small {
 }
 
 #back-cover-img {
-    opacity: 0%;
 
     display: table-cell;
 
@@ -260,11 +275,21 @@ small {
     top: 50%;
     left: 50%;
 
+    opacity: 0;
+
     transform: translate(-50%, -50%);
 
     filter: blur(10px);
     -webkit-filter: blur(10px);
+
+    transition: opacity 0.3s;
 }
+
+.img-visible {
+    opacity: 0.40 !important;
+}
+
+/* FIX BACKGROUND RATIO */
 
 @media screen and (max-aspect-ratio:4/3) {
     #back-cover-img {
@@ -277,16 +302,6 @@ small {
     #back-cover-img {
         width: 100%;
         height: auto;
-    }
-}
-
-.img-visible {
-    animation: visibilizar 5s linear forwards;
-}
-
-@keyframes visibilizar {
-    100% {
-        opacity: 50%;
     }
 }
 
